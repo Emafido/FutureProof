@@ -134,9 +134,9 @@ print(response.json())
 
 **Endpoint:** `POST /auth/signup`
 
-**Description:** Create a new user account
+**Description:** Create a new user account with optional onboarding assessment questionnaire
 
-**Request Body:**
+**Request Body (Auth Only):**
 ```json
 {
   "email": "john@example.com",
@@ -144,12 +144,79 @@ print(response.json())
 }
 ```
 
+**Request Body (With Assessment - Option 1):**
+```json
+{
+  "email": "alex@example.com",
+  "password": "SecurePass123",
+  "mainGoal": "switch-career",
+  "age": "27-30",
+  "currentSituation": "working-non-related",
+  "biggestChallenge": "no-experience",
+  "learningPace": "5-10",
+  "cvFile": {
+    "name": "Alex_Jones_Resume.pdf",
+    "size": 524288,
+    "type": "application/pdf"
+  },
+  "skillLevel": 4,
+  "careerPath": "web-dev",
+  "otherCareerPath": "",
+  "targetTimeframe": "6-months",
+  "learningStyle": "visual",
+  "previousCourses": "building",
+  "certifications": "CS50, Coursera Web Development Bootcamp",
+  "understanding": "yes",
+  "motivation": "I want to earn more income to support my parents.",
+  "hearAbout": "social"
+}
+```
+
+**Request Body (With Assessment - Option 2):**
+```json
+{
+  "email": "student@example.com",
+  "password": "SecurePass123",
+  "mainGoal": "first-job",
+  "age": "18-22",
+  "currentSituation": "university",
+  "biggestChallenge": "limited-time",
+  "learningPace": "2-4",
+  "cvFile": null,
+  "skillLevel": 2,
+  "careerPath": "other-input",
+  "otherCareerPath": "E-commerce Logistics Management",
+  "targetTimeframe": "12-months",
+  "learningStyle": "reading",
+  "previousCourses": "no",
+  "certifications": "",
+  "understanding": "maybe",
+  "motivation": "Need a job before I graduate next year.",
+  "hearAbout": "friend"
+}
+```
+
 **Requirements:**
 - Email must be valid format
 - Password must be at least 8 characters
 - Email must be unique
+- Assessment fields (if provided) must all be present
 
-**cURL Example:**
+**Assessment Field Descriptions:**
+- `mainGoal`: `switch-career`, `first-job`, `build-skills`, `explore`
+- `age`: `15-17`, `18-22`, `23-26`, `27-30`, `31+`
+- `currentSituation`: `secondary`, `university`, `working-non-related`, `unemployed`
+- `biggestChallenge`: `no-experience`, `no-guidance`, `limited-time`, `dont-know`
+- `learningPace`: `2-4`, `5-10`, `11-20`, `20+`
+- `skillLevel`: Integer 1-5
+- `careerPath`: `web-dev`, `data-analysis`, `mobile-dev`, `cloud-engineering`, `other-input`, `explore`
+- `targetTimeframe`: `3-months`, `6-months`, `12-months`, `explore`
+- `learningStyle`: `visual`, `reading`, `kinesthetic`, `social`
+- `previousCourses`: `no`, `incomplete`, `building`
+- `understanding`: `yes`, `maybe`, `curious`, `no`
+- `hearAbout`: `social`, `friend`, `youtube`, `community`, `other`
+
+**cURL Example (Auth Only):**
 ```bash
 curl -X POST \
   -H "Content-Type: application/json" \
@@ -157,7 +224,38 @@ curl -X POST \
   http://localhost:5000/api/auth/signup
 ```
 
-**Expected Response (201):**
+**cURL Example (With Assessment):**
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "alex@example.com",
+    "password": "SecurePass123",
+    "mainGoal": "switch-career",
+    "age": "27-30",
+    "currentSituation": "working-non-related",
+    "biggestChallenge": "no-experience",
+    "learningPace": "5-10",
+    "cvFile": {
+      "name": "Resume.pdf",
+      "size": 524288,
+      "type": "application/pdf"
+    },
+    "skillLevel": 4,
+    "careerPath": "web-dev",
+    "otherCareerPath": "",
+    "targetTimeframe": "6-months",
+    "learningStyle": "visual",
+    "previousCourses": "building",
+    "certifications": "CS50, Coursera",
+    "understanding": "yes",
+    "motivation": "Career advancement",
+    "hearAbout": "social"
+  }' \
+  http://localhost:5000/api/auth/signup
+```
+
+**Expected Response (201 - Auth Only):**
 ```json
 {
   "message": "User created successfully",
@@ -166,13 +264,48 @@ curl -X POST \
     "email": "john@example.com",
     "created_at": "2024-11-28T10:30:00"
   },
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Expected Response (201 - With Assessment):**
+```json
+{
+  "message": "User created successfully",
+  "user": {
+    "id": 1,
+    "email": "alex@example.com",
+    "created_at": "2024-11-28T10:30:00"
+  },
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "assessment": {
+    "id": 1,
+    "user_id": 1,
+    "main_goal": "switch-career",
+    "age": "27-30",
+    "current_situation": "working-non-related",
+    "biggest_challenge": "no-experience",
+    "learning_pace": "5-10",
+    "cv_filename": "Alex_Jones_Resume.pdf",
+    "cv_file_size": 524288,
+    "cv_file_type": "application/pdf",
+    "skill_level": 4,
+    "career_path": "web-dev",
+    "other_career_path": "",
+    "target_timeframe": "6-months",
+    "learning_style": "visual",
+    "previous_courses": "building",
+    "certifications": "CS50, Coursera Web Development Bootcamp",
+    "understanding": "yes",
+    "motivation": "I want to earn more income to support my parents.",
+    "hear_about": "social",
+    "created_at": "2024-11-28T10:30:00"
+  }
 }
 ```
 
 **Common Errors:**
-- 400: Invalid email format or password too short
+- 400: Invalid email format, password too short, or missing assessment fields
 - 409: Email already registered
 
 ---
@@ -277,43 +410,131 @@ curl -X GET \
 
 ## Onboarding Endpoints
 
-### Prerequisites for Onboarding Tests
-1. Complete signup/login to get an access token
-2. All onboarding endpoints require the `Authorization: Bearer <access_token>` header
+All onboarding endpoints require authentication header: `Authorization: Bearer <access_token>`
 
 ---
 
-### 1. Create/Update Biodata (Step 1)
+### Submit/Update Assessment Questionnaire
 
-**Endpoint:** `POST /onboarding/biodata`
+**Endpoint:** `POST /onboarding/assessment`
 
-**Description:** Create or update user's basic information
+**Description:** Submit or update user's onboarding assessment questionnaire. This is the primary onboarding endpoint.
 
-**Request Body:**
+**Request Body (Example 1 - Switch Career):**
 ```json
 {
-  "first_name": "John",
-  "last_name": "Doe",
-  "phone": "+1234567890",
-  "date_of_birth": "1990-01-15",
-  "country": "United States",
-  "city": "New York",
-  "bio": "Software developer passionate about AI",
-  "profile_image": "https://example.com/image.jpg"
+  "mainGoal": "switch-career",
+  "age": "27-30",
+  "currentSituation": "working-non-related",
+  "biggestChallenge": "no-experience",
+  "learningPace": "5-10",
+  "cvFile": {
+    "name": "Alex_Jones_Resume.pdf",
+    "size": 524288,
+    "type": "application/pdf"
+  },
+  "skillLevel": 4,
+  "careerPath": "web-dev",
+  "otherCareerPath": "",
+  "targetTimeframe": "6-months",
+  "learningStyle": "visual",
+  "previousCourses": "building",
+  "certifications": "CS50, Coursera Web Development Bootcamp",
+  "understanding": "yes",
+  "motivation": "I want to earn more income to support my parents.",
+  "hearAbout": "social"
+}
+```
+
+**Request Body (Example 2 - First Job):**
+```json
+{
+  "mainGoal": "first-job",
+  "age": "18-22",
+  "currentSituation": "university",
+  "biggestChallenge": "limited-time",
+  "learningPace": "2-4",
+  "cvFile": null,
+  "skillLevel": 2,
+  "careerPath": "other-input",
+  "otherCareerPath": "E-commerce Logistics Management",
+  "targetTimeframe": "12-months",
+  "learningStyle": "reading",
+  "previousCourses": "no",
+  "certifications": "",
+  "understanding": "maybe",
+  "motivation": "Need a job before I graduate next year.",
+  "hearAbout": "friend"
+}
+```
+
+**Request Body (Example 3 - Explore):**
+```json
+{
+  "mainGoal": "explore",
+  "age": "31+",
+  "currentSituation": "unemployed",
+  "biggestChallenge": "dont-know",
+  "learningPace": "20+",
+  "cvFile": {
+    "name": "Mary_CV.docx",
+    "size": 25000,
+    "type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  },
+  "skillLevel": 1,
+  "careerPath": "explore",
+  "otherCareerPath": "",
+  "targetTimeframe": "explore",
+  "learningStyle": "social",
+  "previousCourses": "incomplete",
+  "certifications": "Salesforce Admin Fundamentals, introductory Python course",
+  "understanding": "curious",
+  "motivation": "I'm looking for a complete career overhaul.",
+  "hearAbout": "youtube"
+}
+```
+
+**Request Body (Example 4 - Build Skills):**
+```json
+{
+  "mainGoal": "build-skills",
+  "age": "15-17",
+  "currentSituation": "secondary",
+  "biggestChallenge": "no-guidance",
+  "learningPace": "11-20",
+  "cvFile": null,
+  "skillLevel": 3,
+  "careerPath": "data-analysis",
+  "otherCareerPath": "",
+  "targetTimeframe": "3-months",
+  "learningStyle": "kinesthetic",
+  "previousCourses": "no",
+  "certifications": "",
+  "understanding": "yes",
+  "motivation": "",
+  "hearAbout": "community"
 }
 ```
 
 **Required Fields:**
-- `first_name`
-- `last_name`
+- `mainGoal`: `switch-career`, `first-job`, `build-skills`, `explore`
+- `age`: `15-17`, `18-22`, `23-26`, `27-30`, `31+`
+- `currentSituation`: `secondary`, `university`, `working-non-related`, `unemployed`
+- `biggestChallenge`: `no-experience`, `no-guidance`, `limited-time`, `dont-know`
+- `learningPace`: `2-4`, `5-10`, `11-20`, `20+`
+- `skillLevel`: Integer 1-5
+- `careerPath`: `web-dev`, `data-analysis`, `mobile-dev`, `cloud-engineering`, `other-input`, `explore`
+- `targetTimeframe`: `3-months`, `6-months`, `12-months`, `explore`
+- `learningStyle`: `visual`, `reading`, `kinesthetic`, `social`
+- `understanding`: `yes`, `maybe`, `curious`, `no`
+- `hearAbout`: `social`, `friend`, `youtube`, `community`, `other`
 
 **Optional Fields:**
-- `phone`
-- `date_of_birth` (format: YYYY-MM-DD)
-- `country`
-- `city`
-- `bio`
-- `profile_image`
+- `cvFile`: File metadata object with name, size, type (null if not provided)
+- `otherCareerPath`: Custom career path if careerPath is `other-input`
+- `previousCourses`: `no`, `incomplete`, `building`
+- `motivation`: User's motivation text
+- `certifications`: Existing certifications
 
 **cURL Example:**
 ```bash
@@ -321,767 +542,175 @@ curl -X POST \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <access_token>" \
   -d '{
-    "first_name": "John",
-    "last_name": "Doe",
-    "phone": "+1234567890",
-    "date_of_birth": "1990-01-15",
-    "country": "United States",
-    "city": "New York",
-    "bio": "Software developer",
-    "profile_image": "https://example.com/image.jpg"
+    "mainGoal": "switch-career",
+    "age": "27-30",
+    "currentSituation": "working-non-related",
+    "biggestChallenge": "no-experience",
+    "learningPace": "5-10",
+    "cvFile": {
+      "name": "Resume.pdf",
+      "size": 524288,
+      "type": "application/pdf"
+    },
+    "skillLevel": 4,
+    "careerPath": "web-dev",
+    "otherCareerPath": "",
+    "targetTimeframe": "6-months",
+    "learningStyle": "visual",
+    "previousCourses": "building",
+    "certifications": "CS50, Coursera",
+    "understanding": "yes",
+    "motivation": "Career advancement",
+    "hearAbout": "social"
   }' \
-  http://localhost:5000/api/onboarding/biodata
+  http://localhost:5000/api/onboarding/assessment
 ```
 
 **Expected Response (201 for new, 200 for update):**
 ```json
 {
-  "message": "Biodata saved successfully",
-  "biodata": {
+  "message": "Assessment submitted successfully",
+  "assessment": {
     "id": 1,
     "user_id": 1,
-    "first_name": "John",
-    "last_name": "Doe",
-    "phone": "+1234567890",
-    "date_of_birth": "1990-01-15",
-    "country": "United States",
-    "city": "New York",
-    "bio": "Software developer",
-    "profile_image": "https://example.com/image.jpg",
-    "created_at": "2024-11-28T10:30:00"
+    "main_goal": "switch-career",
+    "age": "27-30",
+    "current_situation": "working-non-related",
+    "biggest_challenge": "no-experience",
+    "learning_pace": "5-10",
+    "cv_filename": "Alex_Jones_Resume.pdf",
+    "cv_file_size": 524288,
+    "cv_file_type": "application/pdf",
+    "skill_level": 4,
+    "career_path": "web-dev",
+    "other_career_path": "",
+    "target_timeframe": "6-months",
+    "learning_style": "visual",
+    "previous_courses": "building",
+    "certifications": "CS50, Coursera Web Development Bootcamp",
+    "understanding": "yes",
+    "motivation": "I want to earn more income to support my parents.",
+    "hear_about": "social",
+    "recommended_job_titles": null,
+    "created_at": "2024-11-28T10:30:00",
+    "updated_at": "2024-11-28T10:30:00"
   }
 }
 ```
 
 ---
 
-### 2. Get Biodata
+### Get Assessment
 
-**Endpoint:** `GET /onboarding/biodata`
+**Endpoint:** `GET /onboarding/assessment`
 
-**Description:** Retrieve user's biodata
+**Description:** Retrieve user's assessment data
 
 **cURL Example:**
 ```bash
 curl -X GET \
   -H "Authorization: Bearer <access_token>" \
-  http://localhost:5000/api/onboarding/biodata
+  http://localhost:5000/api/onboarding/assessment
 ```
 
 **Expected Response (200):**
 ```json
 {
-  "biodata": {
+  "assessment": {
     "id": 1,
     "user_id": 1,
-    "first_name": "John",
-    "last_name": "Doe",
-    "phone": "+1234567890",
-    "date_of_birth": "1990-01-15",
-    "country": "United States",
-    "city": "New York",
-    "bio": "Software developer",
-    "profile_image": "https://example.com/image.jpg",
-    "created_at": "2024-11-28T10:30:00"
+    "main_goal": "switch-career",
+    "age": "27-30",
+    "current_situation": "working-non-related",
+    "biggest_challenge": "no-experience",
+    "learning_pace": "5-10",
+    "cv_filename": "Alex_Jones_Resume.pdf",
+    "cv_file_size": 524288,
+    "cv_file_type": "application/pdf",
+    "skill_level": 4,
+    "career_path": "web-dev",
+    "other_career_path": "",
+    "target_timeframe": "6-months",
+    "learning_style": "visual",
+    "previous_courses": "building",
+    "certifications": "CS50, Coursera Web Development Bootcamp",
+    "understanding": "yes",
+    "motivation": "I want to earn more income to support my parents.",
+    "hear_about": "social",
+    "recommended_job_titles": null,
+    "created_at": "2024-11-28T10:30:00",
+    "updated_at": "2024-11-28T10:30:00"
   }
 }
 ```
 
 ---
 
-### 3. Add Interest/Skill/Career Preference (Step 2)
+## AI-Generated Recommended Job Titles
 
-**Endpoint:** `POST /onboarding/interests`
+### Generate Job Titles
 
-**Description:** Add interests, skills, or career preferences
+**Endpoint:** `POST /onboarding/recommended-jobs`
 
-**Request Body:**
+**Description:** Generate 3 personalized job title recommendations using Google Gemini AI based on user's assessment profile
+
+**Prerequisites:**
+- User must have completed onboarding assessment via `POST /onboarding/assessment`
+- Google Gemini API key must be set in `.env` file (`GEMINI_API_KEY`)
+
+**Headers Required:**
+```
+Authorization: Bearer <access_token>
+```
+
+**cURL Example:**
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <access_token>" \
+  http://localhost:5000/api/onboarding/recommended-jobs
+```
+
+**Expected Response (200):**
 ```json
 {
-  "category": "skill",
-  "value": "Python",
-  "proficiency_level": "advanced"
+  "message": "Job titles generated successfully",
+  "recommended_job_titles": "Full Stack Web Developer\nFrontend Engineer\nUI/UX Developer"
 }
 ```
 
-**Valid Categories:**
-- `interest`
-- `skill`
-- `career_preference`
-
-**cURL Example - Add Skill:**
-```bash
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <access_token>" \
-  -d '{
-    "category": "skill",
-    "value": "Python",
-    "proficiency_level": "advanced"
-  }' \
-  http://localhost:5000/api/onboarding/interests
-```
-
-**cURL Example - Add Interest:**
-```bash
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <access_token>" \
-  -d '{
-    "category": "interest",
-    "value": "Machine Learning"
-  }' \
-  http://localhost:5000/api/onboarding/interests
-```
-
-**cURL Example - Add Career Preference:**
-```bash
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <access_token>" \
-  -d '{
-    "category": "career_preference",
-    "value": "Remote Work"
-  }' \
-  http://localhost:5000/api/onboarding/interests
-```
-
-**Expected Response (201):**
-```json
-{
-  "message": "Interest/skill added successfully",
-  "interest": {
-    "id": 1,
-    "user_id": 1,
-    "category": "skill",
-    "value": "Python",
-    "proficiency_level": "advanced",
-    "created_at": "2024-11-28T10:30:00"
-  }
-}
-```
+**Error Responses:**
+- `400`: Assessment not completed yet
+- `500`: Failed to generate job titles (API error)
 
 ---
 
-### 4. Get All Interests/Skills/Career Preferences
+### Get Previously Generated Job Titles
 
-**Endpoint:** `GET /onboarding/interests`
+**Endpoint:** `GET /onboarding/recommended-jobs`
 
-**Description:** Retrieve all user interests, skills, and career preferences grouped by category
+**Description:** Retrieve previously generated job title recommendations
+
+**Headers Required:**
+```
+Authorization: Bearer <access_token>
+```
 
 **cURL Example:**
 ```bash
 curl -X GET \
   -H "Authorization: Bearer <access_token>" \
-  http://localhost:5000/api/onboarding/interests
+  http://localhost:5000/api/onboarding/recommended-jobs
 ```
 
 **Expected Response (200):**
 ```json
 {
-  "interests": [
-    {
-      "id": 1,
-      "category": "interest",
-      "value": "Machine Learning",
-      "proficiency_level": null
-    }
-  ],
-  "skills": [
-    {
-      "id": 2,
-      "category": "skill",
-      "value": "Python",
-      "proficiency_level": "advanced"
-    }
-  ],
-  "career_preferences": [
-    {
-      "id": 3,
-      "category": "career_preference",
-      "value": "Remote Work",
-      "proficiency_level": null
-    }
-  ]
+  "recommended_job_titles": "Full Stack Web Developer\nFrontend Engineer\nUI/UX Developer"
 }
 ```
 
----
-
-### 5. Delete Interest/Skill/Career Preference
-
-**Endpoint:** `DELETE /onboarding/interests/<interest_id>`
-
-**Description:** Delete a specific interest/skill/career preference
-
-**cURL Example:**
-```bash
-curl -X DELETE \
-  -H "Authorization: Bearer <access_token>" \
-  http://localhost:5000/api/onboarding/interests/1
-```
-
-**Expected Response (200):**
-```json
-{
-  "message": "Interest deleted successfully"
-}
-```
-
----
-
-### 6. Add Education (Step 3)
-
-**Endpoint:** `POST /onboarding/education`
-
-**Description:** Add education record
-
-**Request Body:**
-```json
-{
-  "institution": "Harvard University",
-  "degree": "Bachelor",
-  "field_of_study": "Computer Science",
-  "start_date": "2020-01-15",
-  "end_date": "2024-05-30",
-  "is_current": false,
-  "grade": "3.8"
-}
-```
-
-**Required Fields:**
-- `institution`
-- `degree`
-- `start_date` (format: YYYY-MM-DD)
-
-**Optional Fields:**
-- `field_of_study`
-- `end_date` (format: YYYY-MM-DD)
-- `is_current` (boolean)
-- `grade`
-
-**cURL Example:**
-```bash
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <access_token>" \
-  -d '{
-    "institution": "Harvard University",
-    "degree": "Bachelor",
-    "field_of_study": "Computer Science",
-    "start_date": "2020-01-15",
-    "end_date": "2024-05-30",
-    "is_current": false,
-    "grade": "3.8"
-  }' \
-  http://localhost:5000/api/onboarding/education
-```
-
-**Expected Response (201):**
-```json
-{
-  "message": "Education record added successfully",
-  "education": {
-    "id": 1,
-    "user_id": 1,
-    "institution": "Harvard University",
-    "degree": "Bachelor",
-    "field_of_study": "Computer Science",
-    "start_date": "2020-01-15",
-    "end_date": "2024-05-30",
-    "is_current": false,
-    "grade": "3.8",
-    "created_at": "2024-11-28T10:30:00"
-  }
-}
-```
-
----
-
-### 7. Get All Education Records
-
-**Endpoint:** `GET /onboarding/education`
-
-**cURL Example:**
-```bash
-curl -X GET \
-  -H "Authorization: Bearer <access_token>" \
-  http://localhost:5000/api/onboarding/education
-```
-
-**Expected Response (200):**
-```json
-{
-  "education": [
-    {
-      "id": 1,
-      "institution": "Harvard University",
-      "degree": "Bachelor",
-      "field_of_study": "Computer Science",
-      "start_date": "2020-01-15",
-      "end_date": "2024-05-30",
-      "is_current": false,
-      "grade": "3.8",
-      "created_at": "2024-11-28T10:30:00"
-    }
-  ]
-}
-```
-
----
-
-### 8. Update Education Record
-
-**Endpoint:** `PUT /onboarding/education/<education_id>`
-
-**Description:** Update a specific education record
-
-**Request Body:** (same as POST, all fields optional)
-
-**cURL Example:**
-```bash
-curl -X PUT \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <access_token>" \
-  -d '{
-    "grade": "3.9"
-  }' \
-  http://localhost:5000/api/onboarding/education/1
-```
-
-**Expected Response (200):**
-```json
-{
-  "message": "Education record updated successfully",
-  "education": {
-    "id": 1,
-    "institution": "Harvard University",
-    "degree": "Bachelor",
-    "field_of_study": "Computer Science",
-    "start_date": "2020-01-15",
-    "end_date": "2024-05-30",
-    "is_current": false,
-    "grade": "3.9",
-    "created_at": "2024-11-28T10:30:00"
-  }
-}
-```
-
----
-
-### 9. Delete Education Record
-
-**Endpoint:** `DELETE /onboarding/education/<education_id>`
-
-**cURL Example:**
-```bash
-curl -X DELETE \
-  -H "Authorization: Bearer <access_token>" \
-  http://localhost:5000/api/onboarding/education/1
-```
-
-**Expected Response (200):**
-```json
-{
-  "message": "Education record deleted successfully"
-}
-```
-
----
-
-### 10. Add Work Experience
-
-**Endpoint:** `POST /onboarding/experience`
-
-**Description:** Add work experience record
-
-**Request Body:**
-```json
-{
-  "company": "Google",
-  "position": "Software Engineer",
-  "description": "Worked on backend microservices",
-  "start_date": "2022-01-15",
-  "end_date": "2024-01-30",
-  "is_current": false
-}
-```
-
-**Required Fields:**
-- `company`
-- `position`
-- `start_date` (format: YYYY-MM-DD)
-
-**Optional Fields:**
-- `description`
-- `end_date` (format: YYYY-MM-DD)
-- `is_current` (boolean)
-
-**cURL Example:**
-```bash
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <access_token>" \
-  -d '{
-    "company": "Google",
-    "position": "Software Engineer",
-    "description": "Worked on backend microservices",
-    "start_date": "2022-01-15",
-    "end_date": "2024-01-30",
-    "is_current": false
-  }' \
-  http://localhost:5000/api/onboarding/experience
-```
-
-**Expected Response (201):**
-```json
-{
-  "message": "Experience added successfully",
-  "experience": {
-    "id": 1,
-    "user_id": 1,
-    "company": "Google",
-    "position": "Software Engineer",
-    "description": "Worked on backend microservices",
-    "start_date": "2022-01-15",
-    "end_date": "2024-01-30",
-    "is_current": false,
-    "created_at": "2024-11-28T10:30:00"
-  }
-}
-```
-
----
-
-### 11. Get All Work Experience
-
-**Endpoint:** `GET /onboarding/experience`
-
-**cURL Example:**
-```bash
-curl -X GET \
-  -H "Authorization: Bearer <access_token>" \
-  http://localhost:5000/api/onboarding/experience
-```
-
-**Expected Response (200):**
-```json
-{
-  "experience": [
-    {
-      "id": 1,
-      "company": "Google",
-      "position": "Software Engineer",
-      "description": "Worked on backend microservices",
-      "start_date": "2022-01-15",
-      "end_date": "2024-01-30",
-      "is_current": false,
-      "created_at": "2024-11-28T10:30:00"
-    }
-  ]
-}
-```
-
----
-
-### 12. Update Work Experience
-
-**Endpoint:** `PUT /onboarding/experience/<experience_id>`
-
-**cURL Example:**
-```bash
-curl -X PUT \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <access_token>" \
-  -d '{
-    "is_current": true
-  }' \
-  http://localhost:5000/api/onboarding/experience/1
-```
-
-**Expected Response (200):**
-```json
-{
-  "message": "Experience updated successfully",
-  "experience": {
-    "id": 1,
-    "company": "Google",
-    "position": "Software Engineer",
-    "description": "Worked on backend microservices",
-    "start_date": "2022-01-15",
-    "end_date": "2024-01-30",
-    "is_current": true,
-    "created_at": "2024-11-28T10:30:00"
-  }
-}
-```
-
----
-
-### 13. Delete Work Experience
-
-**Endpoint:** `DELETE /onboarding/experience/<experience_id>`
-
-**cURL Example:**
-```bash
-curl -X DELETE \
-  -H "Authorization: Bearer <access_token>" \
-  http://localhost:5000/api/onboarding/experience/1
-```
-
-**Expected Response (200):**
-```json
-{
-  "message": "Experience deleted successfully"
-}
-```
-
----
-
-### 14. Add Certification
-
-**Endpoint:** `POST /onboarding/certifications`
-
-**Description:** Add professional certification
-
-**Request Body:**
-```json
-{
-  "name": "AWS Solutions Architect",
-  "issuer": "Amazon Web Services",
-  "issue_date": "2023-06-15",
-  "expiration_date": "2025-06-15",
-  "credential_id": "ABC123XYZ",
-  "credential_url": "https://example.com/verify/cert"
-}
-```
-
-**Required Fields:**
-- `name`
-- `issuer`
-- `issue_date` (format: YYYY-MM-DD)
-
-**Optional Fields:**
-- `expiration_date` (format: YYYY-MM-DD)
-- `credential_id`
-- `credential_url`
-
-**cURL Example:**
-```bash
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <access_token>" \
-  -d '{
-    "name": "AWS Solutions Architect",
-    "issuer": "Amazon Web Services",
-    "issue_date": "2023-06-15",
-    "expiration_date": "2025-06-15",
-    "credential_id": "ABC123XYZ",
-    "credential_url": "https://example.com/verify/cert"
-  }' \
-  http://localhost:5000/api/onboarding/certifications
-```
-
-**Expected Response (201):**
-```json
-{
-  "message": "Certification added successfully",
-  "certification": {
-    "id": 1,
-    "user_id": 1,
-    "name": "AWS Solutions Architect",
-    "issuer": "Amazon Web Services",
-    "issue_date": "2023-06-15",
-    "expiration_date": "2025-06-15",
-    "credential_id": "ABC123XYZ",
-    "credential_url": "https://example.com/verify/cert",
-    "created_at": "2024-11-28T10:30:00"
-  }
-}
-```
-
----
-
-### 15. Get All Certifications
-
-**Endpoint:** `GET /onboarding/certifications`
-
-**cURL Example:**
-```bash
-curl -X GET \
-  -H "Authorization: Bearer <access_token>" \
-  http://localhost:5000/api/onboarding/certifications
-```
-
-**Expected Response (200):**
-```json
-{
-  "certifications": [
-    {
-      "id": 1,
-      "name": "AWS Solutions Architect",
-      "issuer": "Amazon Web Services",
-      "issue_date": "2023-06-15",
-      "expiration_date": "2025-06-15",
-      "credential_id": "ABC123XYZ",
-      "credential_url": "https://example.com/verify/cert",
-      "created_at": "2024-11-28T10:30:00"
-    }
-  ]
-}
-```
-
----
-
-### 16. Update Certification
-
-**Endpoint:** `PUT /onboarding/certifications/<certification_id>`
-
-**cURL Example:**
-```bash
-curl -X PUT \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <access_token>" \
-  -d '{
-    "expiration_date": "2026-06-15"
-  }' \
-  http://localhost:5000/api/onboarding/certifications/1
-```
-
-**Expected Response (200):**
-```json
-{
-  "message": "Certification updated successfully",
-  "certification": {
-    "id": 1,
-    "name": "AWS Solutions Architect",
-    "issuer": "Amazon Web Services",
-    "issue_date": "2023-06-15",
-    "expiration_date": "2026-06-15",
-    "credential_id": "ABC123XYZ",
-    "credential_url": "https://example.com/verify/cert",
-    "created_at": "2024-11-28T10:30:00"
-  }
-}
-```
-
----
-
-### 17. Delete Certification
-
-**Endpoint:** `DELETE /onboarding/certifications/<certification_id>`
-
-**cURL Example:**
-```bash
-curl -X DELETE \
-  -H "Authorization: Bearer <access_token>" \
-  http://localhost:5000/api/onboarding/certifications/1
-```
-
-**Expected Response (200):**
-```json
-{
-  "message": "Certification deleted successfully"
-}
-```
-
----
-
-### 18. Get Complete Profile Summary
-
-**Endpoint:** `GET /onboarding/profile`
-
-**Description:** Get all user information (biodata, interests, skills, education, experience, certifications)
-
-**cURL Example:**
-```bash
-curl -X GET \
-  -H "Authorization: Bearer <access_token>" \
-  http://localhost:5000/api/onboarding/profile
-```
-
-**Expected Response (200):**
-```json
-{
-  "user": {
-    "id": 1,
-    "email": "john@example.com",
-    "created_at": "2024-11-28T10:30:00"
-  },
-  "biodata": {
-    "id": 1,
-    "first_name": "John",
-    "last_name": "Doe",
-    "phone": "+1234567890",
-    "date_of_birth": "1990-01-15",
-    "country": "United States",
-    "city": "New York",
-    "bio": "Software developer",
-    "profile_image": "https://example.com/image.jpg",
-    "created_at": "2024-11-28T10:30:00"
-  },
-  "interests_skills": {
-    "interests": [
-      {
-        "id": 1,
-        "value": "Machine Learning",
-        "proficiency_level": null
-      }
-    ],
-    "skills": [
-      {
-        "id": 2,
-        "value": "Python",
-        "proficiency_level": "advanced"
-      }
-    ],
-    "career_preferences": [
-      {
-        "id": 3,
-        "value": "Remote Work",
-        "proficiency_level": null
-      }
-    ]
-  },
-  "education": [
-    {
-      "id": 1,
-      "institution": "Harvard University",
-      "degree": "Bachelor",
-      "field_of_study": "Computer Science",
-      "start_date": "2020-01-15",
-      "end_date": "2024-05-30",
-      "is_current": false,
-      "grade": "3.8",
-      "created_at": "2024-11-28T10:30:00"
-    }
-  ],
-  "experience": [
-    {
-      "id": 1,
-      "company": "Google",
-      "position": "Software Engineer",
-      "description": "Worked on backend microservices",
-      "start_date": "2022-01-15",
-      "end_date": "2024-01-30",
-      "is_current": false,
-      "created_at": "2024-11-28T10:30:00"
-    }
-  ],
-  "certifications": [
-    {
-      "id": 1,
-      "name": "AWS Solutions Architect",
-      "issuer": "Amazon Web Services",
-      "issue_date": "2023-06-15",
-      "expiration_date": "2025-06-15",
-      "credential_id": "ABC123XYZ",
-      "credential_url": "https://example.com/verify/cert",
-      "created_at": "2024-11-28T10:30:00"
-    }
-  ]
-}
-```
+**Error Responses:**
+- `404`: Assessment not found or no job titles generated yet
 
 ---
 
