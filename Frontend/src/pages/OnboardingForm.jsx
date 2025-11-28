@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, CheckCircle, Briefcase, Zap, Upload, Clock, BookOpen } from 'lucide-react';
 
 export default function FutureProofOnboarding() {
@@ -24,6 +25,8 @@ export default function FutureProofOnboarding() {
     motivation: '',
     hearAbout: ''
   });
+
+  const navigate = useNavigate();
 
   const validateStep = (step) => {
     const newErrors = {};
@@ -82,10 +85,63 @@ export default function FutureProofOnboarding() {
     window.scrollTo(0, 0);
   };
 
-  const handleSubmit = () => {
+  const buildFormData = () => {
+    const apiData = new FormData();
+    
+    // Convert state to API keys (Python uses snake_case in the model, 
+    // but the backend will expect camelCase from JavaScript's FormData object)
+    for (const key in formData) {
+      if (key === 'cvFile') {
+        if (formData.cvFile) {
+            apiData.append('cvFile', formData.cvFile, formData.cvFile.name);
+        }
+      } else if (formData[key] !== null) {
+        // Append all other fields as text
+        apiData.append(key, formData[key]);
+      }
+    }
+    return apiData;
+  };
+
+
+  const handleSubmit = async () => {
     if (validateStep(3)) {
-      alert('🎉 Welcome to FutureProof! Your personalized career roadmap is being generated. Check your email in the next 24 hours!');
-      console.log('Form submitted:', formData);
+      const payload = buildFormData();
+      const API_URL = 'http://localhost:5000/api/auth/api/onboarding/submit'; // Replace with your actual endpoint if different
+      
+      try {
+        // Note: For multipart/form-data, do NOT set 'Content-Type': 'application/json' 
+        // in the headers. The browser handles the Content-Type automatically, 
+        // including the boundary for the file.
+        
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          // Assuming you have a JWT token stored (e.g., in localStorage)
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`, 
+          },
+          body: payload, // Send FormData object directly
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          console.log('Submission Result:', result);
+          // Optional: Redirect the user to a thank you page
+          // window.location.href = '/dashboard'; 
+          setTimeout(() => {
+            navigate('/dashboard'); // Redirect to dashboard after onboarding
+          }, 2000); // Delay for 2 seconds before redirecting
+        } else {
+          // Handle API errors (e.g., missing required fields, server error)
+          const errorMsg = result.msg || 'Submission failed due to an unknown error.';
+          alert(`Submission Failed: ${errorMsg}`);
+          console.error('API Error:', result);
+        }
+      } catch (e) {
+        console.error('Network or unexpected error:', e);
+        alert('An unexpected error occurred. Please check your network connection.');
+      }
     }
   };
 

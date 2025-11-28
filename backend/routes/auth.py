@@ -69,7 +69,7 @@ def signup():
             return jsonify({'error': 'User with this email already exists'}), 409
         
         # Create new user
-        user = User(email=email, full_name=fullName, role=role)
+        user = User(email=email, full_name=fullName, role=role, has_taken_onboarding=False)
         user.set_password(password)
         
         db.session.add(user)
@@ -181,6 +181,111 @@ def login():
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@auth_bp.route('/api/onboarding/submit', methods=['POST'])
+@jwt_required() # Protect the route, assuming you use Flask-JWT-Extended
+def submit_onboarding_assessment():
+    """
+    Handles the submission of the Onboarding Assessment form data, including file upload.
+    This route expects a multipart/form-data request.
+    """
+    
+    # 1. Get the current authenticated User ID
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+
+    # 2. Get form data from request.form (for non-file fields)
+    data = request.form
+
+    # 3. Basic Validation (Mirroring Step 1 & 2 requirements from frontend)
+    required_fields = ['mainGoal', 'age', 'currentSituation', 'biggestChallenge', 
+                       'learningPace', 'careerPath', 'targetTimeframe', 'learningStyle', 
+                       'previousCourses', 'understanding', 'hearAbout']
+    
+    for field in required_fields:
+        if not data.get(field):
+            return jsonify({"msg": f"Missing required field: {field}"}), 400
+
+    # Conditional validation for 'other' career path
+    career_path = data.get('careerPath')
+    other_career_path = data.get('otherCareerPath')
+    if career_path == 'other-input' and not other_career_path:
+        return jsonify({"msg": "Please specify your career path"}), 400
+        
+    # Conditional validation for certifications if relevant option is selected
+    previous_courses = data.get('previousCourses')
+    certifications = data.get('certifications', '')
+    if previous_courses in ['incomplete', 'no-work', 'building'] and not certifications.strip():
+        return jsonify({"msg": "Please list your previous courses/certifications"}), 400
+
+    # 4. Handle CV File Upload (Optional but handled if present)
+    # cv_filename = None
+    # cv_file_size = None
+    # cv_file_type = None
+    
+    # if 'cvFile' in request.files:
+    #     file = request.files['cvFile']
+    #     if file and allowed_file(file.filename):
+    #         if file.content_length > MAX_FILE_SIZE:
+    #             return jsonify({"msg": f"File size exceeds the limit of {MAX_FILE_SIZE_MB}MB"}), 400
+                
+    #         filename = secure_filename(f"{user_id}_{file.filename}") # Prefix with user ID for uniqueness
+    #         file_path = os.path.join(UPLOAD_FOLDER, filename)
+    #         file.save(file_path)
+
+    #         cv_filename = filename
+    #         cv_file_size = file.content_length
+    #         cv_file_type = file.content_type
+    #     elif file.filename != '':
+    #          return jsonify({"msg": "Invalid file type or format. Allowed: PDF, DOCX"}), 400
+
+    # 5. Create or Update OnboardingAssessment record
+    assessment = OnboardingAssessment.query.filter_by(user_id=user_id).first()
+    if not assessment:
+        assessment = OnboardingAssessment(user_id=user_id)
+
+    try:
+        # Map form data to model fields
+        assessment.main_goal = data['mainGoal']
+        assessment.age = data['age']
+        assessment.current_situation = data['currentSituation']
+        assessment.biggest_challenge = data['biggestChallenge']
+        assessment.learning_pace = data['learningPace']
+        assessment.skill_level = int(data.get('skillLevel', 1)) # Default to 1 if not provided
+        assessment.career_path = career_path
+        assessment.other_career_path = other_career_path
+        assessment.target_timeframe = data['targetTimeframe']
+        assessment.learning_style = data['learningStyle']
+        assessment.previous_courses = previous_courses
+        assessment.certifications = certifications
+        assessment.understanding = data['understanding']
+        assessment.motivation = data.get('motivation', '')
+        assessment.hear_about = data['hearAbout']
+        
+        # File data
+        # assessment.cv_filename = cv_filename
+        # assessment.cv_file_size = cv_file_size
+        # assessment.cv_file_type = cv_file_type
+        
+        # Mark User as having completed onboarding
+        user.has_taken_onboarding = True
+
+        db.session.add(assessment)
+        db.session.commit()
+
+        return jsonify({
+            "msg": "Onboarding successfully submitted!",
+            "assessment_id": assessment.id,
+            "user_id": user.id,
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Database error: {e}")
+        return jsonify({"msg": "An internal server error occurred during submission."}), 500
 
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()

@@ -5,6 +5,7 @@ import './loadingPage.css'
 import LandingPage from './pages/LandingPage'
 import SwitchableAuth from './pages/SwitchableAuth.jsx'
 import Dashboard from './pages/Dashboard.jsx'
+import FutureProofOnboarding from './pages/OnboardingForm.jsx'
 
 // Loading component using your CSS
 function Loading() {
@@ -59,6 +60,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/SwitchableAuth" element={<SwitchableAuth />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/onboarding" element={<FutureProofOnboarding />} />
         </Routes>
       </div>
     </>

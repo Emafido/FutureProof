@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import LoginForm from '../components/LoginForm'; // Assuming LoginForm is in the same directory
 import RegisterForm from '../components/RegisterForm'; // Use your actual path for RegisterForm
 
@@ -17,6 +19,8 @@ const SwitchableAuth = () => {
   const [successMessage, setSuccessMessage] = useState(''); 
 
   const API_BASE_URL = 'http://localhost:5000/api/auth';
+
+  const navigate = useNavigate();
 
   // Function to update form state on input change
   const handleChange = (e) => {
@@ -60,7 +64,16 @@ const SwitchableAuth = () => {
         console.log('Login successful. Token:', result.access_token);
         localStorage.setItem('auth_token', result.access_token);
         // Add redirection logic here
-        
+
+        if (result.has_taken_onboarding) {
+          setTimeout(() => {
+            navigate('/dashboard'); // Redirect to dashboard after login
+          }, 1500);
+        } else {
+          setTimeout(() => {
+            navigate('/onboarding'); // Redirect to onboarding if not taken
+          }, 1500);
+        }
       } else {
         // Handle server errors (e.g., 401 Unauthorized)
         setError(result.error || 'Login failed. Please check your credentials.');
@@ -109,6 +122,10 @@ const SwitchableAuth = () => {
         setSuccessMessage('Account created successfully! Logged in automatically.');
         console.log('Registration successful. Token:', result.access_token);
         localStorage.setItem('auth_token', result.access_token);
+
+        setTimeout(() => {
+          navigate('/onboarding'); // Redirect to onboarding after registration
+        }, 1500);
         
       } else {
         setError(result.error || 'Registration failed due to a server error.');
@@ -118,6 +135,7 @@ const SwitchableAuth = () => {
       setError('A network error occurred. Please try again.');
     } finally {
       setLoading(false);
+
     }
   };
   

@@ -1,8 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const LearningDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [activeNav, setActiveNav] = useState('dashboard');
+  const [userInfo, setUserInfo] = useState(
+    { 
+      id: 0,
+      full_name: 'Loading User', // Default fallback
+      email: '',
+      has_taken_onboarding: false,
+      role: 'Learner', // Default fallback
+      joinedDate: ''
+     }
+  )
   const [milestones, setMilestones] = useState([
     {
       id: 1,
@@ -72,6 +83,58 @@ const LearningDashboard = () => {
     { id: 'settings', name: 'Settings', icon: '⚙️' }
   ];
 
+  // Helper function to derive initials
+  const getInitials = (fullName) => {
+    if (!fullName) return 'U?';
+    const names = fullName.split(' ');
+    if (names.length === 1) return names[0].charAt(0).toUpperCase();
+    return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+  };
+
+  // Helper function to get first name
+  const getFirstName = (fullName) => {
+    if (!fullName) return 'User';
+    return fullName.split(' ')[0];
+  }
+
+  const getUserInfo = async () => {
+    setLoading(true); // Start loading
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/me', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch user info');
+      }
+      const data = await response.json();
+      
+      // Update state with fetched data
+      setUserInfo(
+        {
+          id: data.user.id,
+          full_name: data.user.full_name || 'FutureProof User',
+          email: data.user.email || 'N/A',
+          has_taken_onboarding: data.user.has_taken_onboarding || false,
+          role: data.user.role || 'Learner',
+          joinedDate: data.user.created_at || new Date().toISOString()
+        });
+      console.log('User Info:', data);
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+      // Keep fallback data in case of error
+      setUserInfo(prev => ({ ...prev, full_name: 'Guest User', role: 'Offline Mode' }));
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  };
+
+  useEffect(() => {
+    getUserInfo();
+  }, []);
+
   return (
     <div className="flex h-screen bg-gray-50 font-inter">
       {/* Sidebar */}
@@ -79,25 +142,22 @@ const LearningDashboard = () => {
         {/* Logo */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">FP</span>
-            </div>
             {sidebarOpen && (
               <h1 className="text-xl font-bold font-space-grotesk text-gray-900">FutureProof</h1>
             )}
           </div>
         </div>
 
-        {/* User Profile */}
+        {/* User Profile - CORRECTED */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-              AC
+            <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white font-bold">
+              {getInitials(userInfo.full_name)} {/* <-- USED STATE */}
             </div>
             {sidebarOpen && (
               <div>
-                <p className="font-semibold text-gray-900 font-poppins">Alex Chen</p>
-                <p className="text-sm text-gray-600">Frontend Developer</p>
+                <p className="font-semibold text-gray-900 font-poppins">{userInfo.full_name}</p> {/* <-- USED STATE */}
+                <p className="text-sm text-gray-600">{userInfo.role}</p> {/* <-- USED STATE */}
               </div>
             )}
           </div>
@@ -148,7 +208,7 @@ const LearningDashboard = () => {
                 {activeNav === 'dashboard' ? 'Learning Dashboard' : activeNav}
               </h2>
               <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                Student
+                {userInfo.role} {/* <-- USED STATE */}
               </span>
             </div>
             
@@ -180,13 +240,13 @@ const LearningDashboard = () => {
         <main className="flex-1 overflow-auto p-8">
           {activeNav === 'dashboard' && (
             <div className="max-w-7xl mx-auto">
-              {/* Welcome Section */}
+              {/* Welcome Section - CORRECTED */}
               <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 font-poppins mb-2">
-                  Welcome back, Alex! 👋
+                  Welcome back, {getFirstName(userInfo.full_name)}! 👋 {/* <-- USED STATE */}
                 </h1>
                 <p className="text-gray-600 text-lg">
-                  Let's continue your journey to becoming a Frontend Developer.
+                  Let's continue your journey to becoming a {userInfo.role}. {/* <-- USED STATE */}
                 </p>
               </div>
 
