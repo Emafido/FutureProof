@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import QuotesCarousel from './QuotesCarousel';
+import { useNavigate } from 'react-router-dom';
+import QuotesCarousel from '../components/QuotesCarousel';
 
 const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
@@ -10,6 +12,10 @@ const LandingPage = () => {
       element.scrollIntoView({ behavior: 'smooth' });
     }
     setIsMenuOpen(false); // Close mobile menu after clicking
+  };
+
+  const handleAuthNavigation = () => {
+    navigate('/SwitchableAuth');
   };
 
   return (
@@ -48,12 +54,14 @@ const LandingPage = () => {
               </button>
               <div className="flex space-x-4">
                 <button 
+                  onClick={handleAuthNavigation}
                   className="text-blue-600 hover:text-blue-700 transition-colors px-4 py-2"
                   style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}
                 >
                   Login
                 </button>
                 <button 
+                  onClick={handleAuthNavigation}
                   className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                   style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}
                 >
@@ -97,12 +105,14 @@ const LandingPage = () => {
               </button>
               <div className="pt-4 space-y-3 border-t border-gray-200">
                 <button 
+                  onClick={handleAuthNavigation}
                   className="w-full text-blue-600 hover:text-blue-700 transition-colors py-3 text-lg font-medium"
                   style={{ fontFamily: 'Poppins, sans-serif' }}
                 >
                   Login
                 </button>
                 <button 
+                  onClick={handleAuthNavigation}
                   className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors text-lg font-semibold"
                   style={{ fontFamily: 'Poppins, sans-serif' }}
                 >
@@ -124,7 +134,7 @@ const LandingPage = () => {
             className="w-full h-full object-cover"
           />
           {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/40"></div>
+          <div className="absolute inset-0 bg-linear-to-b from-black/80 to-transparent"></div>
         </div>
         
         {/* Hero Content */}
@@ -144,6 +154,7 @@ const LandingPage = () => {
           </p>
           <div className="space-y-4">
             <button 
+              onClick={handleAuthNavigation}
               className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl transform hover:scale-105"
               style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}
             >
@@ -162,7 +173,6 @@ const LandingPage = () => {
       {/* Success Stories Section */}
       <section id="success-stories" className="px-6 py-16 bg-white">
         <div className="max-w-7xl mx-auto">
-         
           <QuotesCarousel />
         </div>
       </section>
@@ -204,7 +214,9 @@ const LandingPage = () => {
             </div>
             <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-xl">🚀</span>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
               </div>
               <h3 
                 className="text-xl font-bold text-gray-900 mb-3"
@@ -323,6 +335,7 @@ const LandingPage = () => {
             Join thousands of young Africans launching their tech careers with personalized roadmaps and AI-powered guidance.
           </p>
           <button 
+            onClick={handleAuthNavigation}
             className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors transform hover:scale-105 shadow-lg"
             style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}
           >
