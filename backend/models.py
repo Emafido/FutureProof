@@ -23,6 +23,7 @@ class User(db.Model):
     experience = db.relationship('Experience', backref='user', cascade='all, delete-orphan')
     certification = db.relationship('Certification', backref='user', cascade='all, delete-orphan')
     onboarding_assessment = db.relationship('OnboardingAssessment', uselist=False, backref='user', cascade='all, delete-orphan')
+    career_roadmap = db.relationship('CareerRoadmap', uselist=False, backref='user', cascade='all, delete-orphan')
     
     def set_password(self, password):
         """Hash and set password"""
@@ -251,6 +252,41 @@ class OnboardingAssessment(db.Model):
             'motivation': self.motivation,
             'hear_about': self.hear_about,
             'recommended_job_titles': self.recommended_job_titles,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
+class CareerRoadmap(db.Model):
+    """AI-generated personalized career roadmap for user"""
+    __tablename__ = 'career_roadmaps'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=True)
+    assessment_id = db.Column(db.Integer, db.ForeignKey('onboarding_assessments.id'), nullable=False)
+    
+    # Roadmap content
+    title = db.Column(db.String(255), nullable=False)  # e.g., "Full Stack Developer Roadmap"
+    description = db.Column(db.Text, nullable=False)  # Overall roadmap description
+    roadmap_json = db.Column(db.JSON, nullable=False)  # Full roadmap structure
+    
+    # Metadata
+    total_duration_months = db.Column(db.Integer)  # Estimated completion time
+    difficulty_level = db.Column(db.String(50))  # beginner, intermediate, advanced
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'assessment_id': self.assessment_id,
+            'title': self.title,
+            'description': self.description,
+            'roadmap': self.roadmap_json,
+            'total_duration_months': self.total_duration_months,
+            'difficulty_level': self.difficulty_level,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
