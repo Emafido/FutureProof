@@ -4,6 +4,7 @@ import './App.css'
 import './loadingPage.css'
 import LandingPage from './components/LandingPage'
 import SwitchableAuth from './components/SwitchableAuth'
+import OnboardingForm from './components/OnboardingForm'
 
 // Loading component using your CSS
 function Loading() {
