@@ -4,6 +4,7 @@ import './App.css'
 import './loadingPage.css'
 import LandingPage from './pages/LandingPage'
 import SwitchableAuth from './pages/SwitchableAuth.jsx'
+import Dashboard from './pages/Dashboard.jsx'
 
 // Loading component using your CSS
 function Loading() {
@@ -13,68 +14,61 @@ function Loading() {
       justifyContent: 'center',
       alignItems: 'center',
       height: '100vh',
-      width: '100%'
+      width: '100%',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      zIndex: 9999,
+      backgroundColor: 'white'
     }}>
       <div className="loader"></div>
     </div>
   )
 }
 
-// Page wrapper component to handle loading states
-function PageWrapper({ children }) {
-  const [isLoading, setIsLoading] = useState(true)
+function App() {
+  const location = useLocation()
+  const [isLoading, setIsLoading] = useState(false)
+  const [currentLocation, setCurrentLocation] = useState(location)
 
   useEffect(() => {
-    // Simulate loading time or remove this if you want instant loading
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000) // Adjust timing as needed
-
-    return () => clearTimeout(timer)
-  }, [])
-
-  if (isLoading) {
-    return <Loading />
-  }
-
-  return children
-}
-
-// Main app content with routing
-function AppContent() {
-  const location = useLocation()
+    // Only show loading if we're actually changing to a different route
+    if (location.pathname !== currentLocation.pathname) {
+      setIsLoading(true)
+      
+      const timer = setTimeout(() => {
+        setIsLoading(false)
+        setCurrentLocation(location)
+      }, 1500)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [location, currentLocation])
 
   return (
     <>
-      <Routes location={location}>
-        <Route 
-          path="/" 
-          element={
-            <PageWrapper>
-              <LandingPage />
-            </PageWrapper>
-          } 
-        />
-        <Route 
-          path="/SwitchableAuth" 
-          element={
-            <PageWrapper>
-              <SwitchableAuth />
-            </PageWrapper>
-          } 
-        />
-        
-      </Routes>
+      {/* Show loading overlay during route transitions */}
+      {isLoading && <Loading />}
+      
+      {/* Main content - always visible but behind loading screen */}
+      <div style={{ 
+        opacity: isLoading ? 0.5 : 1,
+        transition: 'opacity 0.3s ease-in-out'
+      }}>
+        <Routes location={currentLocation}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/SwitchableAuth" element={<SwitchableAuth />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
+      </div>
     </>
   )
 }
 
-function App() {
+export default function AppWrapper() {
   return (
     <Router>
-      <AppContent />
+      <App />
     </Router>
   )
 }
-
-export default App

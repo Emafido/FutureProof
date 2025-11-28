@@ -61,9 +61,9 @@ const RegisterForm = () => {
       </form>
       
       <div className="flex items-center my-6">
-        <div className="flex-grow border-t border-gray-200"></div>
-        <span className="flex-shrink mx-4 text-gray-400 text-sm font-medium">OR</span>
-        <div className="flex-grow border-t border-gray-200"></div>
+        <div className="grow border-t border-gray-200"></div>
+        <span className="shrink mx-4 text-gray-400 text-sm font-medium">OR</span>
+        <div className="grow border-t border-gray-200"></div>
       </div>
       
       <button className="w-full py-3 px-4 border-2 border-gray-200 text-gray-700 font-semibold rounded-lg flex items-center justify-center space-x-3 bg-white hover:bg-gray-50 transition duration-200">
