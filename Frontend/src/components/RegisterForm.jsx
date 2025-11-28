@@ -1,49 +1,70 @@
 import React from 'react';
+import { Loader } from 'lucide-react'; // Import Loader for loading state
 
-const RegisterForm = () => {
+// The component now accepts: handleRegister (submission), handleChange (input updates), 
+// formData (current state), and loading (API call status).
+const RegisterForm = ({ handleRegister, handleChange, formData, loading }) => {
   return (
     <div className="p-6">
-      <form className="space-y-2">
+      <form className="space-y-4" onSubmit={handleRegister}>
+        {/* Full Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Full Name
           </label>
           <input
             type="text"
+            name="fullName" // Crucial: Name property for state update
+            value={formData.fullName} // Bind to state
+            onChange={handleChange} // Update state on change
             placeholder="John Doe"
             required
             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
           />
         </div>
+        
+        {/* Email */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Email
           </label>
           <input
             type="email"
+            name="email" // Crucial: Name property for state update
+            value={formData.email} // Bind to state
+            onChange={handleChange} // Update state on change
             placeholder="you@example.com"
             required
             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
           />
         </div>
+        
+        {/* Password */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Password
           </label>
           <input
             type="password"
+            name="password" // Crucial: Name property for state update
+            value={formData.password} // Bind to state
+            onChange={handleChange} // Update state on change
             placeholder="••••••••"
             required
             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
           />
         </div>
+        
+        {/* Role */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Role
           </label>
           <select
+            name="role" // Crucial: Name property for state update
+            value={formData.role} // Bind to state
+            onChange={handleChange} // Update state on change
             required
-            defaultValue=""
             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition appearance-none cursor-pointer"
           >
             <option value="" disabled>Select your role</option>
@@ -52,14 +73,25 @@ const RegisterForm = () => {
             <option value="admin">Admin</option>
           </select>
         </div>
+        
+        {/* Submit Button */}
         <button
           type="submit"
-          className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-200 transform hover:scale-[1.01] active:scale-[0.99]"
+          disabled={loading} // Disable button while loading
+          className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-200 transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
         >
-          Create Account
+          {loading ? (
+            <>
+              <Loader className="w-5 h-5 animate-spin mr-2" />
+              Creating...
+            </>
+          ) : (
+            'Create Account'
+          )}
         </button>
       </form>
       
+      {/* Divider and Google Button remain unchanged */}
       <div className="flex items-center my-6">
         <div className="grow border-t border-gray-200"></div>
         <span className="shrink mx-4 text-gray-400 text-sm font-medium">OR</span>
@@ -79,4 +111,3 @@ const RegisterForm = () => {
   );
 };
 export default RegisterForm;
-
