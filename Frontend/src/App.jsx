@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import './App.css'
 import './loadingPage.css'
-import LandingPage from './components/LandingPage'
-import SwitchableAuth from './components/SwitchableAuth'
+import LandingPage from './pages/LandingPage'
+import SwitchableAuth from './pages/SwitchableAuth.jsx'
 
 // Loading component using your CSS
 function Loading() {
@@ -55,17 +55,15 @@ function AppContent() {
             </PageWrapper>
           } 
         />
-        {/* Add more routes here as needed */}
-        {/* Example:
         <Route 
-          path="/about" 
+          path="/SwitchableAuth" 
           element={
             <PageWrapper>
-              <AboutPage />
+              <SwitchableAuth />
             </PageWrapper>
           } 
         />
-        */}
+        
       </Routes>
     </>
   )
