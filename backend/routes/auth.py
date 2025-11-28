@@ -34,6 +34,8 @@ def signup():
             return jsonify({'error': 'Email and password are required'}), 400
         
         email = data.get('email').strip().lower()
+        fullName = data.get('fullName').strip()
+        role = data.get('role').strip()
         password = data.get('password')
         
         # Validate email format
@@ -51,7 +53,7 @@ def signup():
             return jsonify({'error': 'User with this email already exists'}), 409
         
         # Create new user
-        user = User(email=email)
+        user = User(email=email, full_name=fullName, role=role)
         user.set_password(password)
         
         db.session.add(user)
