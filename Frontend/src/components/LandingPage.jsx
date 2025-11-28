@@ -124,7 +124,7 @@ const LandingPage = () => {
             className="w-full h-full object-cover"
           />
           {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/40"></div>
+          <div className="absolute inset-0 bg-linear-to-b from-black/8.0 to-transparent"></div>
         </div>
         
         {/* Hero Content */}
@@ -204,7 +204,9 @@ const LandingPage = () => {
             </div>
             <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-xl">🚀</span>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+</svg>
               </div>
               <h3 
                 className="text-xl font-bold text-gray-900 mb-3"
