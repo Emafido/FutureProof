@@ -1,12 +1,13 @@
-import { useState } from 'react'
 import './App.css'
 import LandingPage from './components/LandingPage'
+import SwitchableAuth from './components/SwitchableAuth'
 
 function App() {
 
   return (
     <>
-     <LandingPage />   
+      {/* <LandingPage /> */}
+      {/* <SwitchableAuth /> */}
     </>
   )
 }
