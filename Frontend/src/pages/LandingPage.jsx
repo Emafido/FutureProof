@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import QuotesCarousel from '../components/QuotesCarousel';
 
 const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
@@ -12,10 +11,6 @@ const LandingPage = () => {
       element.scrollIntoView({ behavior: 'smooth' });
     }
     setIsMenuOpen(false); // Close mobile menu after clicking
-  };
-
-  const handleAuthNavigation = () => {
-    navigate('/SwitchableAuth');
   };
 
   return (
@@ -53,20 +48,20 @@ const LandingPage = () => {
                 Challenges
               </button>
               <div className="flex space-x-4">
-                <button 
-                  onClick={handleAuthNavigation}
+                <Link 
+                  to="/SwitchableAuth"
                   className="text-blue-600 hover:text-blue-700 transition-colors px-4 py-2"
                   style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '500' }}
                 >
                   Login
-                </button>
-                <button 
-                  onClick={handleAuthNavigation}
+                </Link>
+                <Link 
+                  to="/SwitchableAuth"
                   className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                   style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}
                 >
                   Sign Up Free
-                </button>
+                </Link>
               </div>
             </nav>
 
@@ -104,20 +99,20 @@ const LandingPage = () => {
                 Challenges
               </button>
               <div className="pt-4 space-y-3 border-t border-gray-200">
-                <button 
-                  onClick={handleAuthNavigation}
-                  className="w-full text-blue-600 hover:text-blue-700 transition-colors py-3 text-lg font-medium"
+                <Link 
+                  to="/SwitchableAuth"
+                  className="w-full text-blue-600 hover:text-blue-700 transition-colors py-3 text-lg font-medium block text-center"
                   style={{ fontFamily: 'Poppins, sans-serif' }}
                 >
                   Login
-                </button>
-                <button 
-                  onClick={handleAuthNavigation}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors text-lg font-semibold"
+                </Link>
+                <Link 
+                  to="/SwitchableAuth"
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors text-lg font-semibold block text-center"
                   style={{ fontFamily: 'Poppins, sans-serif' }}
                 >
                   Sign Up Free
-                </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -134,7 +129,7 @@ const LandingPage = () => {
             className="w-full h-full object-cover"
           />
           {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-linear-to-b from-black/80 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 to-transparent"></div>
         </div>
         
         {/* Hero Content */}
@@ -153,13 +148,13 @@ const LandingPage = () => {
             FutureProof transforms your tech ambitions into actionable roadmaps. Get AI-powered guidance, structured learning, and real mentorship to build in-demand skills.
           </p>
           <div className="space-y-4">
-            <button 
-              onClick={handleAuthNavigation}
-              className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl transform hover:scale-105"
+            <Link 
+              to="/SwitchableAuth"
+              className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl transform hover:scale-105 inline-block"
               style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}
             >
               Join the Journey
-            </button>
+            </Link>
             <p 
               className="text-white/70 text-sm"
               style={{ fontFamily: 'Inter, sans-serif', fontWeight: '500' }}
@@ -334,13 +329,13 @@ const LandingPage = () => {
           >
             Join thousands of young Africans launching their tech careers with personalized roadmaps and AI-powered guidance.
           </p>
-          <button 
-            onClick={handleAuthNavigation}
-            className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors transform hover:scale-105 shadow-lg"
+          <Link 
+            to="/SwitchableAuth"
+            className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors transform hover:scale-105 shadow-lg inline-block"
             style={{ fontFamily: 'Poppins, sans-serif', fontWeight: '600' }}
           >
             Start Building Your Future
-          </button>
+          </Link>
         </div>
       </section>
 
