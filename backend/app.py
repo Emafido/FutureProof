@@ -6,6 +6,7 @@ from config import config
 from models import db
 from routes.auth import auth_bp
 from routes.onboarding import onboarding_bp
+from routes.roadmap import roadmap_bp
 
 def create_app(config_name='development'):
     """Application factory"""
@@ -22,6 +23,7 @@ def create_app(config_name='development'):
     # Register blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(onboarding_bp)
+    app.register_blueprint(roadmap_bp)
     
     # Create tables
     with app.app_context():
