@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from models import db, User
-from functools import wraps
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -58,15 +57,13 @@ def signup():
         db.session.add(user)
         db.session.commit()
         
-        # Generate tokens
+        # Generate access token
         access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
         
         return jsonify({
             'message': 'User created successfully',
             'user': user.to_dict(),
-            'access_token': access_token,
-            'refresh_token': refresh_token
+            'access_token': access_token
         }), 201
     
     except Exception as e:
@@ -98,32 +95,12 @@ def login():
         if not user or not user.check_password(password):
             return jsonify({'error': 'Invalid email or password'}), 401
         
-        # Generate tokens
+        # Generate access token
         access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
         
         return jsonify({
             'message': 'Login successful',
             'user': user.to_dict(),
-            'access_token': access_token,
-            'refresh_token': refresh_token
-        }), 200
-    
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@auth_bp.route('/refresh', methods=['POST'])
-@jwt_required(refresh=True)
-def refresh():
-    """
-    Refresh access token endpoint
-    Headers: Authorization: Bearer <refresh_token>
-    """
-    try:
-        identity = get_jwt_identity()
-        access_token = create_access_token(identity=identity)
-        
-        return jsonify({
             'access_token': access_token
         }), 200
     

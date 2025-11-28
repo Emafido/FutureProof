@@ -59,14 +59,9 @@ The API will be available at `http://localhost:5000`
   "password": "password123"
 }
 ```
-- Response: User object with access and refresh tokens
+- Response: User object with access token
 
-#### 3. Refresh Token
-- **POST** `/api/auth/refresh`
-- Headers: `Authorization: Bearer <refresh_token>`
-- Response: New access token
-
-#### 4. Get Current User
+#### 3. Get Current User
 - **GET** `/api/auth/me`
 - Headers: `Authorization: Bearer <access_token>`
 - Response: Current user information
