@@ -72,141 +72,28 @@ The API will be available at `http://localhost:5000`
 
 All onboarding endpoints require authentication header: `Authorization: Bearer <access_token>`
 
-#### STEP 1: Biodata
+#### Assessment Questionnaire
 
-##### Create/Update Biodata
-- **POST** `/api/onboarding/biodata`
-- Request body:
-```json
-{
-  "first_name": "John",
-  "last_name": "Doe",
-  "phone": "+1234567890",
-  "date_of_birth": "1990-01-15",
-  "country": "United States",
-  "city": "New York",
-  "bio": "Software developer",
-  "profile_image": "https://example.com/image.jpg"
-}
-```
+##### Submit/Update Assessment
+- **POST** `/api/onboarding/assessment`
+- Description: Submit or update user's onboarding assessment questionnaire
+- Request body: Assessment data (see TESTING.md for examples)
+- Response: Assessment object with all fields
 
-##### Get Biodata
-- **GET** `/api/onboarding/biodata`
-- Response: User's biodata
+##### Get Assessment
+- **GET** `/api/onboarding/assessment`
+- Response: User's assessment data
 
----
+#### AI-Generated Job Titles
 
-#### STEP 2: Interests, Skills & Career Preferences
+##### Generate Recommended Job Titles
+- **POST** `/api/onboarding/recommended-jobs`
+- Prerequisites: Assessment must be completed
+- Response: 3 recommended job titles
 
-##### Add Interest/Skill/Career Preference
-- **POST** `/api/onboarding/interests`
-- Request body:
-```json
-{
-  "category": "skill",
-  "value": "Python",
-  "proficiency_level": "advanced"
-}
-```
-- Categories: `interest`, `skill`, `career_preference`
-- Proficiency levels: `beginner`, `intermediate`, `advanced`, `expert`
-
-##### Get All Interests/Skills
-- **GET** `/api/onboarding/interests`
-- Response: Grouped by category (interests, skills, career_preferences)
-
-##### Delete Interest/Skill
-- **DELETE** `/api/onboarding/interests/<id>`
-
----
-
-#### STEP 3: Education
-
-##### Add Education Record
-- **POST** `/api/onboarding/education`
-- Request body:
-```json
-{
-  "institution": "Harvard University",
-  "degree": "Bachelor",
-  "field_of_study": "Computer Science",
-  "start_date": "2020-01-15",
-  "end_date": "2024-05-30",
-  "is_current": false,
-  "grade": "3.8"
-}
-```
-
-##### Get Education Records
-- **GET** `/api/onboarding/education`
-
-##### Update Education Record
-- **PUT** `/api/onboarding/education/<id>`
-
-##### Delete Education Record
-- **DELETE** `/api/onboarding/education/<id>`
-
----
-
-#### STEP 3: Work Experience
-
-##### Add Work Experience
-- **POST** `/api/onboarding/experience`
-- Request body:
-```json
-{
-  "company": "Google",
-  "position": "Software Engineer",
-  "description": "Worked on backend services",
-  "start_date": "2022-01-15",
-  "end_date": "2024-01-30",
-  "is_current": false
-}
-```
-
-##### Get Work Experience
-- **GET** `/api/onboarding/experience`
-
-##### Update Work Experience
-- **PUT** `/api/onboarding/experience/<id>`
-
-##### Delete Work Experience
-- **DELETE** `/api/onboarding/experience/<id>`
-
----
-
-#### STEP 3: Certifications
-
-##### Add Certification
-- **POST** `/api/onboarding/certifications`
-- Request body:
-```json
-{
-  "name": "AWS Solutions Architect",
-  "issuer": "Amazon Web Services",
-  "issue_date": "2023-06-15",
-  "expiration_date": "2025-06-15",
-  "credential_id": "ABC123",
-  "credential_url": "https://example.com/cert"
-}
-```
-
-##### Get Certifications
-- **GET** `/api/onboarding/certifications`
-
-##### Update Certification
-- **PUT** `/api/onboarding/certifications/<id>`
-
-##### Delete Certification
-- **DELETE** `/api/onboarding/certifications/<id>`
-
----
-
-#### Complete Profile Summary
-
-##### Get Full Profile
-- **GET** `/api/onboarding/profile`
-- Response: All user information including biodata, interests, education, experience, and certifications
+##### Get Recommended Job Titles
+- **GET** `/api/onboarding/recommended-jobs`
+- Response: Previously generated job titles
 
 ---
 
@@ -283,6 +170,16 @@ All onboarding endpoints require authentication header: `Authorization: Bearer <
 - `FLASK_ENV`: Flask environment (development/production/testing)
 - `DATABASE_URL`: SQLite database path (default: sqlite:///futureproof.db)
 - `JWT_SECRET_KEY`: Secret key for JWT signing (change in production)
+- `GEMINI_API_KEY`: Google Gemini API key for job title generation
+
+## Setup Instructions
+
+### Get Gemini API Key
+
+1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Click "Create API Key"
+3. Copy the API key
+4. Add to `.env` file: `GEMINI_API_KEY=your-key-here`
 
 ## Error Responses
 
