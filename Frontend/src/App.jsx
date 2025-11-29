@@ -57,7 +57,7 @@ function App() {
         transition: 'opacity 0.3s ease-in-out'
       }}>
         <Routes location={currentLocation}>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="/SwitchableAuth" element={<SwitchableAuth />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/onboarding" element={<FutureProofOnboarding />} />
