@@ -97,6 +97,29 @@ All onboarding endpoints require authentication header: `Authorization: Bearer <
 
 ---
 
+### Roadmap Endpoints
+
+All roadmap endpoints require authentication header: `Authorization: Bearer <access_token>`
+
+#### Get User's Saved Roadmap
+- **GET** `/api/roadmap`
+- Description: Retrieve the user's personalized career roadmap
+- Prerequisites: Roadmap must be generated first via POST endpoint
+- Response: Complete roadmap object with phases, skills, resources, and timeline
+
+#### Generate/Regenerate Roadmap
+- **POST** `/api/roadmap`
+- Description: Generate a new personalized roadmap based on assessment
+- Prerequisites: User must have completed onboarding assessment
+- Response: Generated roadmap with all details
+
+#### Check Roadmap Status
+- **GET** `/api/roadmap/status`
+- Description: Quick check if user has a saved roadmap
+- Response: Status information (has_roadmap boolean + metadata)
+
+---
+
 ## Database Schema
 
 ### Users Table

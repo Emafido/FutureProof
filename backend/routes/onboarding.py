@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import db, User, OnboardingAssessment
+from models import db, User, OnboardingAssessment, CareerRoadmap
 from datetime import datetime
 
 onboarding_bp = Blueprint('onboarding', __name__, url_prefix='/api/onboarding')
@@ -205,6 +205,105 @@ def get_recommended_jobs():
         
         return jsonify({
             'recommended_job_titles': assessment.recommended_job_titles
+        }), 200
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ===================== AI-GENERATED CAREER ROADMAP =====================
+
+@onboarding_bp.route('/roadmap', methods=['POST'])
+@jwt_required()
+def generate_roadmap():
+    """
+    Generate and save a complete personalized career roadmap based on user's assessment.
+    
+    Prerequisites:
+    - User must have completed the onboarding assessment
+    - Google Gemini API key must be configured
+    
+    Returns: Full roadmap with milestones, skills, resources, and timeline
+    """
+    try:
+        from utils.ai_service import generate_career_roadmap
+        
+        user = get_current_user_or_404()
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Get user's assessment
+        assessment = OnboardingAssessment.query.filter_by(user_id=user.id).first()
+        
+        if not assessment:
+            return jsonify({'error': 'Please complete the onboarding assessment first'}), 400
+        
+        # Build profile for AI
+        profile = {
+            'assessment': assessment.to_dict(),
+            'user': {
+                'email': user.email,
+                'full_name': user.full_name
+            }
+        }
+        
+        # Generate roadmap using AI
+        roadmap_data = generate_career_roadmap(profile)
+        
+        if not roadmap_data:
+            return jsonify({'error': 'Failed to generate roadmap'}), 500
+        
+        # Check if roadmap already exists
+        roadmap = CareerRoadmap.query.filter_by(user_id=user.id).first()
+        
+        if roadmap:
+            # Update existing roadmap
+            roadmap.title = roadmap_data.get('title')
+            roadmap.description = roadmap_data.get('description')
+            roadmap.roadmap_json = roadmap_data.get('roadmap')
+            roadmap.total_duration_months = roadmap_data.get('total_duration_months')
+            roadmap.difficulty_level = roadmap_data.get('difficulty_level')
+        else:
+            # Create new roadmap
+            roadmap = CareerRoadmap(
+                user_id=user.id,
+                assessment_id=assessment.id,
+                title=roadmap_data.get('title'),
+                description=roadmap_data.get('description'),
+                roadmap_json=roadmap_data.get('roadmap'),
+                total_duration_months=roadmap_data.get('total_duration_months'),
+                difficulty_level=roadmap_data.get('difficulty_level')
+            )
+        
+        db.session.add(roadmap)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Roadmap generated successfully',
+            'roadmap': roadmap.to_dict()
+        }), 200
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@onboarding_bp.route('/roadmap', methods=['GET'])
+@jwt_required()
+def get_roadmap():
+    """
+    Retrieve user's saved career roadmap.
+    """
+    try:
+        user = get_current_user_or_404()
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        roadmap = CareerRoadmap.query.filter_by(user_id=user.id).first()
+        
+        if not roadmap:
+            return jsonify({'error': 'Roadmap not generated yet'}), 404
+        
+        return jsonify({
+            'roadmap': roadmap.to_dict()
         }), 200
     
     except Exception as e:
