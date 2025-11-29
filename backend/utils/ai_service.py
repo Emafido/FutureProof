@@ -25,12 +25,12 @@ def generate_job_titles(user_profile):
         profile_text = build_profile_text(user_profile)
         
         # Create prompt
-        prompt = f"""Based on the following user profile, suggest exactly 3 job titles that would be suitable for this person.
+        prompt = f"""Based on the following user profile, suggest a job title that would be suitable for this person.
 
-User Profile:
-{profile_text}
+        User Profile:
+        {profile_text}
 
-Return ONLY the 3 job titles, one per line. No numbering, no explanations, just the job titles."""
+        Return ONLY the job title. No numbering, no explanations, just the job title."""
         
         # Initialize Gemini model
         model = genai.GenerativeModel('gemini-2.5-flash')

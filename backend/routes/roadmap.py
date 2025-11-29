@@ -227,7 +227,9 @@ def get_roadmap_status():
                 'title': roadmap.title,
                 'created_at': roadmap.created_at.isoformat(),
                 'last_updated': roadmap.updated_at.isoformat(),
-                'total_duration_months': roadmap.total_duration_months
+                'total_duration_months': roadmap.total_duration_months,
+                'roadmap_summary': roadmap.description,
+                'roadmap': roadmap.roadmap_json
             }), 200
         else:
             return jsonify({
@@ -272,14 +274,13 @@ def generate_roadmap():
             "email": user.email,
             "full_name": getattr(user, 'full_name', ''),
             "current_skills": getattr(user, 'skills', '').split(',') if getattr(user, 'skills', '') else [],
-            "level": getattr(user, 'level', 'beginner'),
-            "experience_years": getattr(user, 'experience_years', 0)
+            "skill_level": str(assessment.skill_level) + " out of 5 is the users proficiency level.",
         }
         
         # Add assessment data if available
         if assessment:
             user_profile_json.update({
-                "skill_level": assessment.skill_level,
+                "skill_level": str(assessment.skill_level) + " out of 5",
                 "career_path": assessment.career_path,
                 "learning_style": assessment.learning_style,
                 "target_timeframe": assessment.target_timeframe,
@@ -288,6 +289,23 @@ def generate_roadmap():
         
         # Generate roadmap using the service
         roadmap = generate_market_aware_roadmap(user_profile_json, target_job_title)
+
+        roady = CareerRoadmap(
+            user_id=user.id,
+            assessment_id=assessment.id if assessment else None,
+            title=f"{target_job_title}",
+            description=f"A personalized career roadmap to become a {target_job_title}.",
+            roadmap_json=roadmap,
+            total_duration_months=assessment.target_timeframe if assessment else None,
+            difficulty_level="intermediate"
+        )
+
+        db.session.add(roady)
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'error': f"Database commit failed: {str(e)}"}), 500
         
         return jsonify({'roadmap': roadmap}), 200
     
