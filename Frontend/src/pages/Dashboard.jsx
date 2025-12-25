@@ -21,20 +21,6 @@ const LearningDashboard = () => {
   // State for Milestones (Populated from API)
   const [milestones, setMilestones] = useState([]);
 
-  // State for static tasks (Placeholder)
-  const [upcomingTasks, setUpcomingTasks] = useState([
-    { id: 1, text: "Deploy portfolio to Netlify", completed: false },
-    { id: 2, text: "Start React fundamentals module", completed: false },
-    { id: 3, text: "Join community Q&A session", completed: false }
-  ]);
-
-  // State for static achievements (Placeholder)
-  const [achievements, setAchievements] = useState([
-    { id: 1, name: "HTML Pro", description: "Complete HTML fundamentals", icon: "💪", unlocked: true },
-    { id: 2, name: "CSS Wizard", description: "Master CSS layouts", icon: "🎨", unlocked: false },
-    { id: 3, name: "JS Beginner", description: "Write first JavaScript", icon: "⚡", unlocked: false }
-  ]);
-
   // Navigation Items
   const navigationItems = [
     { id: 'dashboard', name: 'Dashboard', icon: '📊' },
@@ -58,7 +44,7 @@ const LearningDashboard = () => {
   const getFirstName = (fullName) => {
     if (!fullName) return 'User';
     return fullName.split(' ')[0];
-  }
+  };
 
   const getUserInfo = async () => {
     setLoading(true);
@@ -135,7 +121,7 @@ const LearningDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   // --- EFFECTS ---
   useEffect(() => {
@@ -152,29 +138,11 @@ const LearningDashboard = () => {
     ));
   };
 
-  const toggleTaskComplete = (id) => {
-    setUpcomingTasks(upcomingTasks.map(task => 
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ));
-  };
-
-  const getInitials = (fullName) => {
-    if (!fullName) return 'U?';
-    const names = fullName.split(' ');
-    if (names.length === 1) return names[0].charAt(0).toUpperCase();
-    return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
-  };
-
-  const getFirstName = (fullName) => {
-    if (!fullName) return 'User';
-    return fullName.split(' ')[0];
-  }
-
   const navigate = useNavigate();
 
   const handleRetakeOnboarding = () => {
     navigate('/onboarding');
-  }
+  };
 
   // --- RENDER ---
   return (
@@ -290,47 +258,35 @@ const LearningDashboard = () => {
                 {/* Left Column - Progress & Roadmap */}
                 <div className="xl:col-span-2 space-y-8">
                   
-                  {/* Progress Overview (Static for now, can be connected later) */}
+                  {/* Career Profile */}
                   <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                  <div className="flex justify-between items-center mb-6">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 font-poppins">
-                        Career Profile
-                      </h3>
-                      <p className="text-sm text-gray-500">Manage your learning path settings</p>
-                    </div>
-
-                    <button
-                      onClick={handleRetakeOnboarding}
-                      className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-100"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
-                      <span>Retake Onboarding</span>
-                    </button>
-                  </div>
-                  
-                  {/* Optional: Add context about what this does */}
-                  <div className="bg-gray-50 rounded-xl p-4 text-sm text-gray-600">
-                    <p>
-                      Current Role Target: <span className="font-semibold text-gray-900">{roadmapData.title || 'your chosen career'}</span>
-                    </p>
-                    <p className="mt-1">
-                      Want to change your path? Retaking onboarding will generate a new roadmap based on your new goals.
-                    </p>
-                  </div>
-                </div>
-
+                    <div className="flex justify-between items-center mb-6">
                       <div>
-                        <div className="flex justify-between text-sm text-gray-600 mb-2">
-                          <span>React</span>
-                          <span>20%</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2.5">
-                          <div className="bg-purple-500 h-2.5 rounded-full" style={{ width: '20%' }}></div>
-                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 font-poppins">
+                          Career Profile
+                        </h3>
+                        <p className="text-sm text-gray-500">Manage your learning path settings</p>
                       </div>
+
+                      <button
+                        onClick={handleRetakeOnboarding}
+                        className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-100"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        <span>Retake Onboarding</span>
+                      </button>
+                    </div>
+                    
+                    {/* Optional: Add context about what this does */}
+                    <div className="bg-gray-50 rounded-xl p-4 text-sm text-gray-600">
+                      <p>
+                        Current Role Target: <span className="font-semibold text-gray-900">{roadmapData.title || 'your chosen career'}</span>
+                      </p>
+                      <p className="mt-1">
+                        Want to change your path? Retaking onboarding will generate a new roadmap based on your new goals.
+                      </p>
                     </div>
                   </div>
 
@@ -454,7 +410,7 @@ const LearningDashboard = () => {
     {/* AI Mentor Message (Left Aligned) */}
     <div className="flex items-start space-x-3">
       {/* Avatar */}
-      <div className="flex-shrink-0 w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center border border-blue-200 shadow-sm">
+      <div className="shrink-0 w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center border border-blue-200 shadow-sm">
         <span className="text-blue-600 font-bold text-xs">AI</span>
       </div>
 
@@ -531,10 +487,10 @@ const LearningDashboard = () => {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </div> */}
 
-                  Upcoming Tasks
-                  <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                  {/* Upcoming Tasks */}
+                  {/* <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="font-semibold text-gray-900 font-poppins">Upcoming Tasks</h3>
                       <span className="text-sm text-gray-500">
